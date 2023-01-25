@@ -110,7 +110,11 @@ namespace FakeUserDataGenerator.Controllers
                     {
                         rowsToApplyErrors[index] = 1;
                     }
-                    seedFinal = new Random(seedFinal - page).Next();
+
+                    byte[] byteArray = Encoding.ASCII.GetBytes((seedFinal - page).ToString());
+                    SHA256 mySHA256 = SHA256.Create();
+                    var hashStuff = mySHA256.ComputeHash(byteArray);
+                    seedFinal = new Random(GetSeedFromString(ToHex(hashStuff,false))).Next();
                 }
             }
 
@@ -196,10 +200,18 @@ namespace FakeUserDataGenerator.Controllers
             {
                 return stringToApplyError.Remove(position, 1);
             }
+            else if (typeOfError == 2)
+            {
+                return stringToApplyError.Insert(position, RNDcharForSwapping.ToString());
+            }
 
             if (typeOfError == 1 && stringToApplyError.Length < 40)
             {
                 return stringToApplyError.Insert(position, RNDcharForSwapping.ToString());
+            }
+            else if(typeOfError == 1)
+            {
+                return stringToApplyError.Remove(position, 1);
             }
             if (typeOfError == 3)
             {
